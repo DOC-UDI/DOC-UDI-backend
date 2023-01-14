@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const { User, Doc, Appointment } = require("../models");
-const crypto = require("crypto");
+var CryptoJS = require("crypto-js");
 
 // creating new admin
 const createDoc = async (req, res) => {
@@ -96,10 +96,6 @@ const uploadPrescription = async (req, res) => {
   const { docPfp, docID, patientID, docName, specialization, clinicAddress, patientName, date, time, fees, prescription } = req.body;
 
   let medicalHistory = [];
-  const algorithm = "aes-256-cbc"; 
-  const initVector = crypto.randomBytes(16);
-  const Securitykey = crypto.randomBytes(32);
-
 
   await User.findById(patientID, (err, userData) => {
     if(!userData || err){
@@ -108,12 +104,12 @@ const uploadPrescription = async (req, res) => {
       return;
     }
     else{
-      const decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);
-      let decryptedData = decipher.update(userData.medicalHistory, "hex", "utf-8");
-      decryptedData += decipher.final("utf8");
-
-      medicalHistory = decryptedData;
-      console.log(medicalHistory);
+      if(userData.medicalHistory !== ""){
+        var bytes  = CryptoJS.AES.decrypt(userData.medicalHistory, 'secret key 123');
+        var originalText = bytes.toString(CryptoJS.enc.Utf8);
+        medicalHistory = JSON.parse(originalText);
+        console.log(medicalHistory);
+      }
     }
   });
 
@@ -130,13 +126,12 @@ const uploadPrescription = async (req, res) => {
   }
 
   medicalHistory = [...medicalHistory, newPrescription];
-  const message = JSON.stringify(medicalHistory);
-  const cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
-  let encryptedData = cipher.update(message, "utf-8", "hex");
-  encryptedData += cipher.final("hex");
+  console.log("reached");
+  var ciphertext = CryptoJS.AES.encrypt(JSON.stringify(medicalHistory), 'secret key 123').toString();
+
 
   await User.updateOne({ _id: patientID }, 
-    { medicalHistory: encryptedData },
+    { medicalHistory: ciphertext },
     function (err, updateRes) {
     if (err){
         console.log(err);
@@ -245,8 +240,11 @@ const startAppointment = async (req, res) => {
         res.json({ success: false, message: "error in finding medical history" });
       }
       else{
-        console.log("medical history of patient given")
-        const medicalHistory = prevAppointments.medicalHistory;
+        console.log("medical history of patient given");
+        var bytes  = CryptoJS.AES.decrypt(prevAppointments.medicalHistory, 'secret key 123');
+        var originalText = bytes.toString(CryptoJS.enc.Utf8);
+
+        const medicalHistory = JSON.parse(originalText);
         res.json({ success: true, currentAppointment, medicalHistory });
       }
     });

@@ -31,30 +31,3 @@ const server = http.createServer(app);
 server.listen(PORT, function () {
   console.log(`Server is up on ${PORT}`);
 });
-
-
-const data = [
-  {
-      abs: "nsjdns",
-      dhsdjs: {
-          hbjashdbajshd: "jdsdsbdh",
-          sbsbdbhbhsx: "jdsdsbdh"
-      }
-  },
-  {
-      abs: "nsjdns",
-      sjanjsahx: {
-          hbjashdbajshd: "jdsdsbdh",
-          sbsbdbhbhsx: "jdsdsbdh"
-      }
-  }
-]
-
-
-const decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);
-
-let decryptedData = decipher.update(encryptedData, "hex", "utf-8");
-
-decryptedData += decipher.final("utf8");
-
-console.log("Decrypted message: " + JSON.parse(decryptedData));
