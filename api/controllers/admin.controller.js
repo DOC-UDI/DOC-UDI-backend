@@ -243,8 +243,14 @@ const startAppointment = async (req, res) => {
         console.log("medical history of patient given");
         var bytes  = CryptoJS.AES.decrypt(prevAppointments.medicalHistory, 'secret key 123');
         var originalText = bytes.toString(CryptoJS.enc.Utf8);
+        let medicalHistory;
 
-        const medicalHistory = JSON.parse(originalText);
+        if(prevAppointments.medicalHistory.length !== "")
+        {
+          medicalHistory = JSON.parse(originalText);
+        } else {
+          medicalHistory = [];
+        }
         res.json({ success: true, currentAppointment, medicalHistory });
       }
     });
