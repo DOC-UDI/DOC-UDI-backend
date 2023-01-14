@@ -1,5 +1,7 @@
 const jwt = require("jsonwebtoken");
 const { User, Appointment, Doc } = require("../models");
+var CryptoJS = require("crypto-js");
+
 
 require("dotenv").config();
 
@@ -124,8 +126,12 @@ const previousAppointments = async (req, res) => {
       res.json({ success: false, message: "error in finding prev appointments" });
     }
     else{
-      console.log("prev appointments of patient given")
-      const medicalHistory = prevAppointments.medicalHistory;
+      console.log("prev appointments of patient given");
+      var bytes  = CryptoJS.AES.decrypt(prevAppointments.medicalHistory, 'secret key 123');
+      var originalText = bytes.toString(CryptoJS.enc.Utf8);
+      
+      const medicalHistory = JSON.parse(originalText);
+
       res.json({ success: true, medicalHistory });
     }
   })
