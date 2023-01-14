@@ -6,7 +6,7 @@ require("dotenv").config();
 // creating new user
 const createUser = async (req, res) => {
   console.log("in createUser");
-  const medicalHistory = [];
+  const medicalHistory = "";
   const { name, email, password, pfp } = req.body;
   const isNewUser = await User.isThisEmailInUse(email);
   if (!isNewUser)
