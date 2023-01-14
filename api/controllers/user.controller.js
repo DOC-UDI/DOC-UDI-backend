@@ -130,7 +130,10 @@ const previousAppointments = async (req, res) => {
       var bytes  = CryptoJS.AES.decrypt(prevAppointments.medicalHistory, 'secret key 123');
       var originalText = bytes.toString(CryptoJS.enc.Utf8);
       
-      const medicalHistory = JSON.parse(originalText);
+      let medicalHistory = "";
+      if(prevAppointments.medicalHistory !== ""){
+        medicalHistory = JSON.parse(originalText);
+      }
 
       res.json({ success: true, medicalHistory });
     }
