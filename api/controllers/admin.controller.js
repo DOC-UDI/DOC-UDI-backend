@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
 const { User, Doc, Appointment } = require("../models");
+const crypto = require("crypto");
 
 // creating new admin
 const createDoc = async (req, res) => {
@@ -95,6 +96,11 @@ const uploadPrescription = async (req, res) => {
   const { docPfp, docID, patientID, docName, specialization, clinicAddress, patientName, date, time, fees, prescription } = req.body;
 
   let medicalHistory = [];
+  const algorithm = "aes-256-cbc"; 
+  const initVector = crypto.randomBytes(16);
+  const Securitykey = crypto.randomBytes(32);
+
+
   await User.findById(patientID, (err, userData) => {
     if(!userData || err){
       console.log(err);
@@ -102,7 +108,12 @@ const uploadPrescription = async (req, res) => {
       return;
     }
     else{
-      medicalHistory = userData.medicalHistory;
+      const decipher = crypto.createDecipheriv(algorithm, Securitykey, initVector);
+      let decryptedData = decipher.update(userData.medicalHistory, "hex", "utf-8");
+      decryptedData += decipher.final("utf8");
+
+      medicalHistory = decryptedData;
+      console.log(medicalHistory);
     }
   });
 
@@ -118,11 +129,14 @@ const uploadPrescription = async (req, res) => {
     prescription: prescription,
   }
 
-  // medicalHistory.push(newPrescription);
   medicalHistory = [...medicalHistory, newPrescription];
+  const message = JSON.stringify(medicalHistory);
+  const cipher = crypto.createCipheriv(algorithm, Securitykey, initVector);
+  let encryptedData = cipher.update(message, "utf-8", "hex");
+  encryptedData += cipher.final("hex");
 
   await User.updateOne({ _id: patientID }, 
-    { medicalHistory },
+    { medicalHistory: encryptedData },
     function (err, updateRes) {
     if (err){
         console.log(err);

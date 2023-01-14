@@ -18,22 +18,23 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  medicalHistory: [
-    {
-      docPfp: String,
-      docName: String,
-      specialization: String,
-      clinicAddress: String,
-      patientName: String,
-      date: String,
-      time: {
-        startTime: String,
-        endTime: String
-      },
-      fees: String,
-      prescription: String
-    },
-  ],
+  // medicalHistory: [
+  //   {
+  //     docPfp: String,
+  //     docName: String,
+  //     specialization: String,
+  //     clinicAddress: String,
+  //     patientName: String,
+  //     date: String,
+  //     time: {
+  //       startTime: String,
+  //       endTime: String
+  //     },
+  //     fees: String,
+  //     prescription: String
+  //   },
+  // ],
+  medicalHistory: String,
   tokens: [{ type: Object }],
 });
 
