@@ -245,7 +245,7 @@ const startAppointment = async (req, res) => {
         var originalText = bytes.toString(CryptoJS.enc.Utf8);
         let medicalHistory;
 
-        if(prevAppointments.medicalHistory.length !== "")
+        if(prevAppointments.medicalHistory !== "")
         {
           medicalHistory = JSON.parse(originalText);
         } else {
